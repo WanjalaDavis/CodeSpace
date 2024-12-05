@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Community Forum{% endblock %}
+
+{% block content %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<div class="container my-5">
+    <h1 class="text-center fw-bold">Developer's <a href="{% url 'forum' %}">Forum</a>  </h1>
+    <p class="text-muted text-center">Connect with other developers, ask questions, share resources, and collaborate.</p>
+
+
+<!-- Button to Trigger the Modal -->
+
+<div class="d-flex justify-content-center my-4">
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#leaderboardModal">
+        View Leaderboard
+    </button>
+</div>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="leaderboardModal" tabindex="-1" aria-labelledby="leaderboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" id="leaderboardModalLabel">Leaderboard</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <section>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Questions</th>
+                                    <th>Answers</th>
+                                    <th>Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in leaderboard %}
+                                    <tr>
+                                        <td>{{ profile.user.username }}</td>
+                                        <td>{{ profile.total_questions }}</td>
+                                        <td>{{ profile.total_answers }}</td>
+                                        <td>{{ profile.total_activity }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="mb-5">
+    <h2 class="text-center text-primary">Browse by Categories</h2>
+    <div class="d-flex flex-wrap justify-content-center">
+        {% for category in categories %}
+            <a href="{% url 'category_view' category.slug %}" class="btn btn-outline-primary m-2">{{ category.name }}</a>
+        {% empty %}
+            <p class="text-center">No categories available.</p>
+        {% endfor %}
+    </div>
+</section>
+
+
+
+<!-- Post Question Section -->
+<div class="card shadow-sm my-4 bg-dark">
+    <div class="card-body">
+        <h5 class="card-title text-light">Post a Question</h5>
+        <form method="POST" action="{% url 'post_question' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="question-title" class="form-label">Title</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="question-title"
+                    name="title"
+                    placeholder="Enter your question title"
+                    required
+                >
+            </div>
+            <div class="mb-3">
+                <label for="question-body" class="form-label">Description</label>
+                <textarea
+                    class="form-control"
+                    id="question-body"
+                    name="body"
+                    rows="4"
+                    placeholder="Describe your question in detail"
+                    required
+                ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Question</button>
+        </form>
+    </div>
+</div>
+
+<h2 class="fw-bold my-4 text-center" style="margin-bottom: 0">Talk with Other Developers</h2>
+
+<!-- Questions Loop -->
+{% for question in questions %}
+    <div class="card shadow-sm my-3 bg-dark">
+        <div class="card-body">
+            <h5 class="card-title fw-bold text-primary">{{ question.title }}</h5>
+            <p class="card-text text-truncate text-light" style="max-width: 100ch;">
+                {{ question.body|truncatechars:250 }}
+            </p>
+            <small class="text-warning">
+                Asked by {{ question.user.username }} on {{ question.created_at|date:"M d, Y" }}
+            </small>
+            <div class="d-flex align-items-center justify-content-between mt-3">
+                <a href="{% url 'view_question' question.id %}" class="btn btn-info btn-sm">View Details</a>
+                <button
+                    class="btn btn-outline-primary btn-sm"
+                    onclick="likeQuestion({{ question.id }})">
+                    Like <span id="likes-count-{{ question.id }}">{{ question.likes.count }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<!-- Pagination Links -->
+<div class="d-flex justify-content-center my-4">
+    {{ questions.paginator }}
+</div>
+<!-- Tabs for Replies and Post a Reply -->
+<ul class="nav nav-tabs" id="questionTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="replies-tab" data-bs-toggle="tab" data-bs-target="#replies" type="button" role="tab">
+            Replies
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="post-reply-tab" data-bs-toggle="tab" data-bs-target="#post-reply" type="button" role="tab">
+            Post a Reply
+        </button>
+    </li>
+</ul>
+
+<div class="questions">
+    {% for question in questions %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">{{ question.title }}</h5>
+                <p class="card-text">{{ question.body }}</p>
+                <small class="text-muted">
+                    By {{ question.user.username }} on {{ question.created_at|date:"M d, Y" }}
+                </small>
+            </div>
+
+            <!-- Tab Content for Replies and Post Reply -->
+            <div class="tab-content mt-3 bg-dark">
+                <!-- Replies Tab -->
+                <div class="tab-pane fade show active" id="replies" role="tabpanel">
+                    {% if question.replies.count > 0 %}
+                        {% for reply in question.replies.all %}
+                            <div class="card bg-light p-3 mb-2">
+                                <p class="mb-1">{{ reply.body }}</p>
+                                <small class="text-muted">
+                                    By {{ reply.user.username }} on {{ reply.created_at|date:"M d, Y" }}
+                                </small>
+                                <button
+                                    class="btn btn-outline-primary btn-sm mt-2"
+                                    onclick="likeReply({{ reply.id }})">
+                                    Like <span id="reply-likes-count-{{ reply.id }}">{{ reply.likes.count }}</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No replies yet. Be the first to reply!</p>
+                    {% endif %}
+                </div>
+
+                <!-- Post Reply Tab -->
+                <div class="tab-pane fade" id="post-reply" role="tabpanel">
+                    <form method="POST" action="{% url 'reply_question' question.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <textarea
+                                class="form-control"
+                                name="reply"
+                                rows="3"
+                                placeholder="Write your reply here..."
+                                required
+                            ></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Post Reply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Trending Questions Section -->
+<section class="mb-4 bg-dark" style="margin-top: 0;">
+    <h2 class="text-center text-warning">Trending Questions</h2>
+    <div class="list-group">
+        {% for question in trending_questions %}
+            <a href="{% url 'view_question' question.id %}" class="list-group-item list-group-item-action">
+                <h5>{{ question.title }}</h5>
+                <p class="text-muted">
+                    {{ question.replies.count }} answers |
+                    {{ question.views }} views |
+                    {{ question.created_at|date:"M d, Y" }}
+                </p>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+
+   <!-- List of Notes -->
+<section class="my-5 bg-dark">
+    <h2 class="fw-bold text-center text-warning mb-4">Download Shared Notes</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for note in notes %}
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ note.title }}</h5>
+                        <a href="{{ note.file.url }}" class="btn btn-outline-success btn-sm" download>Download</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Share Notes Section -->
+<section class="my-5 bg-dark">
+    <div class="card shadow-lg border-0">
+        <div class="card-body bg-dark">
+            <h5 class="card-title text-center text-warning mb-4">Share PDF Notes</h5>
+            <form method="POST" action="{% url 'upload_notes' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="note-title" class="form-label text-light">Title</label>
+                    <input type="text" class="form-control" id="note-title" name="title" placeholder="Enter title for your notes" required>
+                </div>
+                <div class="mb-3">
+                    <label for="pdf-file" class="form-label text-light">Upload PDF</label>
+                    <input type="file" class="form-control" id="pdf-file" name="file" accept="application/pdf" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Upload Notes</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Upload Video Tutorials Section -->
+<section class="my-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body bg-dark">
+            <h5 class="card-title text-center text-warning mb-4">Upload Video Tutorials</h5>
+            <form method="POST" action="{% url 'upload_video' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="video-title" class="form-label text-light">Title</label>
+                    <input type="text" class="form-control" id="video-title" name="title" placeholder="Enter a title for your tutorial" required>
+                </div>
+                <div class="mb-3">
+                    <label for="video-file" class="form-label text-light">Upload Video</label>
+                    <input type="file" class="form-control" id="video-file" name="video" accept="video/*" required>
+                </div>
+                <button type="submit" class="btn btn-warning w-100">Submit for Review</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Approved Videos Section -->
+<section class="my-5">
+    <h5 class="text-center text-muted mb-4">Approved Videos</h5>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for video in approved_videos %}
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <video class="card-img-top" controls>
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ video.title }}</h5>
+                        <p class="text-muted">Uploaded by {{ video.user.username }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+    <script src="{% static 'js/call.js' %}">
+</script>
+
+{% endblock content%}

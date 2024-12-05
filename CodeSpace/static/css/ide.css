@@ -1,0 +1,15 @@
+body.dark-theme {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-theme .card {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+body.dark-theme .alert-info {
+    background-color: #333;
+    color: #e0e0e0;
+}
+

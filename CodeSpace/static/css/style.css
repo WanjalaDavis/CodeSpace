@@ -1,0 +1,30 @@
+#successMessage {
+        opacity: 1;
+        transition: opacity 1s ease-out;
+    }
+
+    #successMessage.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+body {
+        background-color: #f8f9fa;
+    }
+
+.list-group-item:hover {
+        background-color: #f1f1f1;
+    }
+
+
+    @keyframes wave {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(15deg); }
+        50% { transform: rotate(0deg); }
+        75% { transform: rotate(-15deg); }
+        100% { transform: rotate(0deg); }
+    }
+
+    .waving {
+        animation: wave 1.5s ease-in-out infinite;
+    }

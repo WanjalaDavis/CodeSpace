@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<div class="container my-5">
+    <!-- Welcome Message with Black Background -->
+    <div class="text-center mb-4 p-5" style="background-color: #000000; color: white; border-radius: 10px;">
+        <h1 class="fw-bold">Welcome,
+            <img id="wavingHand" src="{% static 'images/img.png' %}" alt="Profile Picture" class="rounded-circle shadow" style="height: 50px; width: 50px">
+            {{ user.username }}!
+        </h1>
+        <p class="text-light">Manage your profile and projects here.</p>
+    </div>
+</div>
+
+
+    <!-- Profile Section -->
+    <div class="row bg-dark">
+        <!-- Profile Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if user.profile.photo %}
+                        <img src="{{ user.profile.photo.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/WanjalaTechSolutions_logo.png' %}" alt="Default Profile Picture" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% endif %}
+                    <h5 class="fw-bold">{{ user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <p><small>Joined: {{ user.date_joined|date:"F j, Y" }}</small></p>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="bi bi-camera"></i> Upload Picture
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+
+<!-- Create Project Form -->
+<div class="col-md-8">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Create a New Project</h5>
+            <form method="POST" action="{% url 'create_project' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="projectName" class="form-label">Project Name:</label>
+                    <input type="text" class="form-control" id="projectName" name="project_name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="fileType" class="form-label">File Type:</label>
+                    <select class="form-select" id="fileType" name="file_type" required>
+                        <option value="html">HTML</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Create Project</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container my-5 bg-dark">
+    <h4 class="fw-bold text-center mb-4">Your Achievements</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4 text-center">
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <i class="bi bi-trophy-fill text-warning fs-1"></i>
+                    <h5 class="card-title mt-3">Projects Completed</h5>
+                    <p class="text-muted display-6 fw-bold">{{ achievements.projects_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <i class="bi bi-people-fill text-success fs-1"></i>
+                    <h5 class="card-title mt-3">Collaborations</h5>
+                    <p class="text-muted display-6 fw-bold">5</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <i class="bi bi-star-fill text-primary fs-1"></i>
+                    <h5 class="card-title mt-3">Skill Level</h5>
+                    <p class="text-muted display-6 fw-bold">Advanced</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{##}
+{#<div class="container mt-5 text-light">#}
+{#    <h4 class="fw-bold text-center mb-4">Your Skills</h4>#}
+{#    <div class="row">#}
+{#        {% for skill in skills %}#}
+{#        <div class="col-md-6">#}
+{#            <div class="mb-3">#}
+{#                <label class="form-label fw-bold text-light">{{ skill.name }}</label>#}
+{#                <div class="progress">#}
+{#                    <div class="progress-bar bg-success text-light" role="progressbar" style="width: {{ skill.level }}%;" aria-valuenow="{{ skill.level }}" aria-valuemin="0" aria-valuemax="100">#}
+{#                        {{ skill.level }}%#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        {% empty %}#}
+{#        <p class="text-muted text-center">No skills added yet. Update your profile to showcase your expertise!</p>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#</div>#}
+
+<div class="container mt-5 text-light">
+    <h4 class="fw-bold text-center mb-4">Your Goals</h4>
+    <div class="card shadow-sm">
+        <div class="card-body bg-light ">
+            <form method="POST" action="{% url 'add_goal' %}">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" name="goal" placeholder="Set a new goal" required>
+                    <button class="btn btn-primary" type="submit">Add Goal</button>
+                </div>
+            </form>
+            <ul class="list-group">
+                {% for goal in goals %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ goal.text }}
+                        <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteGoalModal{{ goal.id }}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-center text-muted">No goals set yet. Add one above!</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{##}
+{##}
+{#<div class="container mt-1">#}
+{#    <h4 class="fw-bold text-center mb-4">Recent Activity</h4>#}
+{#    <ul class="list-group">#}
+{#        {% for activity in recent_activities %}#}
+{#            <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#                {{ activity.description }}#}
+{#                <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>#}
+{#            </li>#}
+{#        {% empty %}#}
+{#            <li class="list-group-item text-center text-muted">#}
+{#                No recent activity found.#}
+{#            </li>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{#</div>#}
+
+
+    <!-- Projects List -->
+    <div class="mt-5">
+        <h4 class="fw-bold text-center mb-4">Your Projects</h4>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for project in projects %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.name }}</h5>
+                        <p class="card-text">
+                            <span class="badge bg-secondary">{{ project.file_type|capfirst }}</span>
+                        </p>
+                        <div class="d-flex justify-content-between">
+                            <a href="#" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ project.id }}">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ project.id }}">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                            {% if project.file_type == 'html' %}
+                                <a href="{% url 'begin_coding' project.id %}" class="btn btn-success btn-sm">
+                                    <i class="bi bi-code-slash"></i> Start Coding
+                                </a>
+                            {% else %}
+                                <a href="{% url 'payment_page' project.id %}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-credit-card"></i> Pay to Access
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    No projects found. Create your first project above!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h4 class="fw-bold text-center mb-4">Inspiration for You</h4>
+    <div class="card shadow-sm bg-dark text-white text-center p-5">
+        <blockquote class="blockquote">
+            <p>{{ random_quote }}</p>
+        </blockquote>
+    </div>
+</div>
+
+
+
+<!-- Modals for Upload, Edit, and Delete -->
+<div class="modals">
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'upload_profile_photo' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Choose a photo:</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit and Delete Modals -->
+    {% for project in projects %}
+    <div class="modal fade" id="editModal{{ project.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ project.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{% url 'edit_project' project.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Project</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Project Name:</label>
+                            <input type="text" class="form-control" name="project_name" value="{{ project.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">File Type:</label>
+                            <select class="form-select" name="file_type" required>
+                                <option value="html" {% if project.file_type == 'html' %}selected{% endif %}>HTML</option>
+                                <option value="python" {% if project.file_type == 'python' %}selected{% endif %}>Python</option>
+                                <option value="java" {% if project.file_type == 'java' %}selected{% endif %}>Java</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal{{ project.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ project.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'delete_project' project.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete "{{ project.name }}"?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="mb-5">
+
+    <h2 class="text-center text-primary">{{ category.name }}</h2>
+    <p class="text-center">{{ category.description }}</p>
+    <div class="list-group">
+        {% for question in questions %}
+            <a href="{% url 'view_question' question.id %}" class="list-group-item list-group-item-action">
+                <h5>{{ question.title }}</h5>
+                <p class="text-muted">
+                    {{ question.replies.count }} answers |
+                    {{ question.views }} views |
+                    {{ question.created_at|date:"M d, Y" }}
+                </p>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock content %}

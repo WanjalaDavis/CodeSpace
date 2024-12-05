@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Premium CodeSpace{% endblock %}
+{% load static %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/ide.css' %}">
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <!-- Luxurious Welcome Section -->
+            <div class="p-5" style="background-color: #212121; color: #f5c500; border-radius: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
+                <h2 class="display-4 mb-4" style="color: #f5c500;">Welcome to the Premium CodeSpace</h2>
+                <p class="lead mb-5" style="color: #e0e0e0;">
+                    Unlock your full potential and bring your projects to life with our state-of-the-art IDE! Start coding now and make your ideas a reality.
+                </p>
+
+                <!-- Dark Mode Toggle Button -->
+                <button id="themeToggle" class="btn btn-outline-warning btn-circle mb-4" style="font-size: 1.5rem;">
+                    <i class="fas fa-eye"></i>
+                </button>
+
+                <!-- Profile Link with Gold Accent -->
+                <a href="/profile/" class="btn btn-warning mb-4" style="font-weight: bold;">Go to Profile</a>
+            </div>
+
+            <div class="card shadow-lg p-4 mb-5" style="border-color: #f5c500;">
+                <h4 class="text-dark" style="color: #f5c500;">Features:</h4>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check-circle text-warning"></i> Real-time collaboration with teammates</li>
+                    <li><i class="fas fa-check-circle text-warning"></i> Supports both Python and Java languages</li>
+                    <li><i class="fas fa-check-circle text-warning"></i> Code execution and debugging directly in the IDE</li>
+                    <li><i class="fas fa-check-circle text-warning"></i> Save, load, and manage your project files easily</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-info my-0" role="alert">
+                <strong>Tip:</strong> You can switch between Python and Java to start coding in the language of your choice!
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button to Open Projects Section (Located Above IDE) -->
+<div class="container my-4">
+    <button id="toggleProjectsBtn" class="btn btn-warning w-100 mb-4" style="font-weight: bold; border-radius: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+        <i class="fas fa-folder-open"></i> Project File
+    </button>
+
+    <!-- Projects Section (Hidden by Default, Shown When Button is Clicked) -->
+    <div id="projectsSection" class="d-none">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h3 class="text-primary mb-4" style="font-weight: bold; color: #f5c500;">Project File</h3>
+                <div id="projectsList" class="d-flex justify-content-center flex-wrap gap-4">
+                    {% for project in projects %}
+                    <div class="card mb-3" style="width: 180px; height: 200px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">
+                        <div class="card-body d-flex flex-column justify-content-between" style="background-color: #212121; color: white;">
+                            <h5 class="card-title text-center" style="font-size: 1.2rem; font-weight: bold; color: #f5c500;">{{ project.name }}</h5>
+                            <p class="card-text text-center" style="font-size: 0.9rem; color: #e0e0e0;">File Type: {{ project.file_type|capfirst }}</p>
+                            <button class="btn btn-warning btn-sm w-100 mt-2" onclick="loadFiles('{{ project.id }}')" style="border-radius: 20px; font-weight: bold;">
+                                Load Files
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-muted">No Python or Java projects found. Start creating your first project!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Some Hover Effects -->
+<style>
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    .card button:hover {
+        background-color: #f5c500;
+        color: #212121;
+    }
+</style>
+
+<!-- JavaScript to Toggle Projects Section -->
+<script>
+    // Toggle button for Projects Section
+    const toggleProjectsBtn = document.getElementById('toggleProjectsBtn');
+    const projectsSection = document.getElementById('projectsSection');
+
+    toggleProjectsBtn.addEventListener('click', () => {
+        if (projectsSection.classList.contains('d-none')) {
+            projectsSection.classList.remove('d-none');
+        } else {
+            projectsSection.classList.add('d-none');
+        }
+    });
+</script>
+
+
+
+    <!-- CodeSpace Editor Section -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3 class="text-primary">CodeSpace</h3>
+            <!-- Language Selector -->
+            <select id="languageSelector" class="form-select mb-3">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+            </select>
+            <!-- Monaco Editor -->
+            <div id="editorContainer" style="height: 400px; width: 100%; border: 1px solid #ddd;"></div>
+        </div>
+
+        <div class="col-12">
+            <!-- Run Code Button -->
+            <button id="runBtn" class="btn btn-primary mb-3 w-100">Run Code</button>
+
+            <!-- Console Output Section -->
+            <div id="consoleOutput" class="mt-4 p-3 bg-light rounded" style="height: 200px; overflow-y: auto;">
+                <h4 class="mb-3">Console Output</h4>
+                <pre id="outputText" style="white-space: pre-wrap;">Running...</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save File Form (Hidden) -->
+    <form id="saveFileForm" class="my-5">
+        <input type="text" id="fileName" class="form-control" placeholder="File name" required>
+        <textarea id="fileContent" style="display:none;"></textarea>
+        <button type="submit" class="btn btn-success mt-2 w-100">Save File</button>
+    </form>
+</div>
+
+<!-- JavaScript for Monaco Editor and Code Execution -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.js"></script>
+<script>
+    // Initialize Monaco Editor
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' } });
+    let editor;
+
+    require(['vs/editor/editor.main'], function () {
+        editor = monaco.editor.create(document.getElementById('editorContainer'), {
+            value: "// Start coding here...",
+            language: "javascript", // Default language
+            theme: "vs-dark",
+            automaticLayout: true,
+        });
+    });
+
+    // Change Language
+    document.getElementById('languageSelector').addEventListener('change', (event) => {
+        monaco.editor.setModelLanguage(editor.getModel(), event.target.value);
+    });
+
+    // Run Code
+    document.getElementById('runBtn').addEventListener('click', async () => {
+        const code = editor.getValue();
+        const language = document.getElementById('languageSelector').value;
+
+        // Show output in the console area
+        const outputConsole = document.getElementById('outputText');
+        outputConsole.textContent = "Running..."; // Display loading message
+
+        try {
+            const response = await axios.post("{% url 'run_code' %}", {
+                code: code,
+                language: language,
+            });
+
+            // Update console with output or error
+            outputConsole.textContent = response.data.output || "No output returned.";
+        } catch (error) {
+            // Handle error and update console
+            outputConsole.textContent = "Error executing code:\n" + error.response?.data?.error || error.message;
+        }
+    });
+
+    // Save File
+    document.getElementById('saveFileForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const fileName = document.getElementById('fileName').value;
+        const fileContent = editor.getValue();
+
+        try {
+            await axios.post("{% url 'save_file' %}", {
+                file_name: fileName,
+                content: fileContent,
+            });
+            alert("File saved successfully!");
+        } catch (error) {
+            alert("Error saving file.");
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header Section -->
+    <h2 class="text-center text-warning">Messaging</h2>
+    <p class="text-muted text-center">Send and view messages with other developers.</p>
+
+    <!-- Send Message Section -->
+    <div class="card shadow-sm my-4 bg-dark">
+        <div class="card-body">
+            <h4 class="text-light">Send a Message to:- <span class="text-primary">{{ user.username }}</span></h4>
+            {% if success %}
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                Message sent successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="message" class="form-control" rows="5" placeholder="Type your message..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Received Messages Section -->
+    <div class="card shadow-sm my-4">
+        <div class="card-body">
+            <h4>Received Messages</h4>
+            {% if received_messages %}
+            <ul class="list-group mt-3">
+                {% for message in received_messages %}
+                <li class="list-group-item text-light">
+                    <strong>From:</strong> {{ message.sender.username }} <span class="text-muted">({{ message.timestamp|date:"M d, Y H:i" }})</span>
+                    <p class="mt-2">{{ message.content }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted mt-3">You have no messages.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

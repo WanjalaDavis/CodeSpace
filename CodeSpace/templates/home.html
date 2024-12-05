@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}WanjalaTech{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5">
+    <h1 class="my-4 fw-bold">Welcome to WanjalaTech</h1>
+    <p class="text-muted">Your one-stop platform for collaborative coding, project management, and innovation.</p>
+
+    <!-- Call to Action -->
+    <div class="d-flex justify-content-center my-4">
+        <button class="btn btn-primary btn-lg me-3" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+        <button class="btn btn-secondary btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+    </div>
+</div>
+
+
+    <!-- Highlight Features -->
+    <div class="row my-5 bg-dark">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-warning">Collaborate</h5>
+                    <p class="card-text">Work together with your team in real-time, share ideas, and build projects seamlessly.</p>
+                    <a href="#" class="btn btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-warning">Manage Projects</h5>
+                    <p class="card-text">Create, organize, and track the progress of your projects with ease.</p>
+                    <a href="#" class="btn btn-outline-secondary">View Projects</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-warning">Innovate</h5>
+                    <p class="card-text">Bring your creative ideas to life with our integrated tools and resources.</p>
+                    <a href="#" class="btn btn-outline-success">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Featured Projects Section -->
+<section class="bg-dark py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-4">Featured Projects</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <img src="{% static 'images/img_2.png' %}" class="card-img-top" alt="Project 1">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-warning">Task Management System</h5>
+                        <p class="card-text text-muted">An AI-powered solution for automating tasks and improving efficiency.</p>
+                        <a href="#" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <img src="{% static 'images/img_2.png' %}" class="card-img-top" alt="Project 2">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-warning">CodeSpace</h5>
+                        <p class="card-text text-muted">A collaborative coding platform designed for seamless teamwork.</p>
+                        <a href="#" class="btn btn-outline-secondary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <img src="{% static 'images/img_2.png' %}" class="card-img-top" alt="Project 3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-warning">WanjalaTech Solution</h5>
+                        <p class="card-text text-muted">An open-source framework for creating innovative tech solutions.</p>
+                        <a href="#" class="btn btn-outline-success">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="bg-dark text-white py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-4 text-warning">What Our Users Say</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="testimonial bg-light text-dark p-3 rounded shadow-sm">
+                    <p class="fw-bold">"WanjalaTech has transformed the way my team collaborates!"</p>
+                    <p class="text-muted mb-0">- Wanjala Davis, Software Engineer</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial bg-light text-dark p-3 rounded shadow-sm">
+                    <p class="fw-bold">"An all-in-one platform for managing projects efficiently."</p>
+                    <p class="text-muted mb-0">- Vivian Rosa, Project Manager</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial bg-light text-dark p-3 rounded shadow-sm">
+                    <p class="fw-bold">"A game-changer for developers and innovators alike."</p>
+                    <p class="text-muted mb-0">- Alex Kimani, Full-Stack Developer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerModalLabel">Register</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'register' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password1" name="password1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="login-username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="login-username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password" name="password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
